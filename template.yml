@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Mitjan CloudFormation -testitemplate
+
+Parameters:
+  GitHubKey:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: GitHubKey
+
+Resources:
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: codepipeline-ap-northeast-1-894649464590
+      Name: Pipeline-CFtesti
+      RoleArn: arn:aws:iam::821383200340:role/MitjaCICD
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: ActionSource
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: 1
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                Owner: haimila
+                Repo: cfpipeline
+                Branch: master
+                OAuthToken: !Ref GitHubKey
+                PollForSourceChanges: false
+        - Name: Deploy
+          Actions:
+            - Name: ReleaseAction
+              InputArtifacts:
+                - Name: SourceOutput
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: '1'
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: cf-pipelinestack
+                RoleArn: arn:aws:iam::821383200340:role/MitjaCF
+                TemplatePath: 'SourceOutput::cfpipeline.yml'
