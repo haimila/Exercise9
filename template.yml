@@ -47,3 +47,18 @@ Resources:
                 StackName: cf-pipelinestack
                 RoleArn: arn:aws:iam::821383200340:role/MitjaCF
                 TemplatePath: 'SourceOutput::cfpipeline.yml'
+
+  Webhook:
+    Type: 'AWS::CodePipeline::Webhook'
+    Properties:
+      AuthenticationConfiguration:
+        SecretToken: !Ref GitHubKey
+      Filters:
+        - JsonPath: "$.ref"
+          MatchEquals: refs/heads/master
+      Authentication: GITHUB_HMAC
+      TargetPipeline: !Ref Pipeline
+      TargetAction: ActionSource
+      Name: MyWebhook
+      TargetPipelineVersion: !GetAtt Pipeline.Version
+      RegisterWithThirdParty: 'true'
