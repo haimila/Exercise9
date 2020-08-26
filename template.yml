@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Mitjan CloudFormation -pipelinetestailu
-# testimuutos2
+# testimuutos3
 Parameters:
   GitHubKey:
     Type: 'AWS::SSM::Parameter::Value<String>'
